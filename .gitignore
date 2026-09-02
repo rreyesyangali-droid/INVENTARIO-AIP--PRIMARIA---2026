@@ -1,7 +1,0 @@
-node_modules
-dist
-dist-ssr
-.firebase
-firebase-debug.log
-*.local
-.DS_Store
