@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#6E1E2B" />
+<title>Inventario I.E. N° 0162 San José Obrero</title>
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="manifest" href="manifest.json" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+  :root{
+    --bg:#F7F2E6; --card:#FFFFFF; --ink:#2B1116; --inkSoft:#7A5C55;
+    --accent:#6E1E2B; --accentSoft:#F1DCC9; --gold:#C99A3B; --border:#E3D3B8;
+    --bueno:#2F7D4C; --regular:#B8862B; --malo:#B23A2E;
+  }
+  *{box-sizing:border-box; font-family:'Courier Prime','Courier New',Courier,monospace; font-weight:700;}
+  body{margin:0; background:var(--bg); color:var(--ink); padding-bottom:60px;}
+  header{padding:28px 20px 20px; border-bottom:3px double var(--gold); background:linear-gradient(180deg, var(--accentSoft) 0%, rgba(255,255,255,0) 100%);}
+  .header-row{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .header-left{display:flex; align-items:center; gap:12px;}
+  .logo-badge{width:64px; height:64px; min-width:64px; border-radius:9999px; background:#fff; border:3px solid #fff; box-shadow:0 2px 6px rgba(43,17,22,.35), 0 0 0 3px var(--gold); overflow:hidden;}
+  .logo-badge img{width:100%; height:100%; object-fit:contain;}
+  .eyebrow{color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:.1em; margin:0;}
+  #schoolName{
+    font-size:1.55rem; color:#5C0F1D; font-weight:700; background:transparent; border:none; outline:none; width:100%; margin-top:4px; padding:0;
+    -webkit-text-stroke:2.2px #FFFFFF; paint-order: stroke fill;
+    text-shadow: 0 0 3px #FFFFFF, 1px 1px 0 #FFFFFF, -1px -1px 0 #FFFFFF, 1px -1px 0 #FFFFFF, -1px 1px 0 #FFFFFF, 0 2px 3px rgba(43,17,22,.35);
+  }
+  .subtitle{font-size:.9rem; color:var(--inkSoft); margin:4px 0 0;}
+  #saveState{font-size:12px; color:var(--bueno); height:20px;}
+  #saveState.error{color:var(--malo);}
+  .px{padding-left:20px; padding-right:20px;}
+  .section-label{font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:24px 0 8px;}
+  .resumen-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+  @media(min-width:640px){.resumen-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:900px){.resumen-grid{grid-template-columns:repeat(4,1fr);}}
+  .resumen-chip{background:var(--card); border:1px solid var(--border); border-radius:6px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .resumen-chip span:first-child{font-size:12px; color:var(--inkSoft);}
+  .resumen-chip span:last-child{color:var(--accent); font-size:1rem;}
+  .stats-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:720px; margin-top:16px;}
+  .stat-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px;}
+  .stat-value{font-size:1.65rem; margin:0;}
+  .stat-label{font-size:12px; color:var(--inkSoft); margin:4px 0 0;}
+  .toolbar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:24px;}
+  .search-box{display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:6px; padding:8px 12px; flex:1;}
+  .search-box input{border:none; outline:none; background:transparent; width:100%; font-size:14px;}
+  #exportBtn{display:flex; align-items:center; gap:8px; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:10px 16px; font-size:14px; cursor:pointer;}
+  .legend{display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:var(--inkSoft); margin-top:16px; align-items:center;}
+  .legend b{font-weight:700;}
+  .cards-grid{display:grid; grid-template-columns:1fr; gap:16px; margin-top:16px;}
+  @media(min-width:640px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1024px){.cards-grid{grid-template-columns:repeat(3,1fr);}}
+  .cat-card{position:relative; background:var(--card); border:2px dashed var(--border); border-radius:10px; padding:16px;}
+  .cat-code{position:absolute; top:-12px; right:-8px; background:var(--accentSoft); color:var(--accent); font-size:11px; padding:4px 8px; border-radius:9999px;}
+  .cat-title{font-size:1.2rem; margin:0;}
+  .cat-total{font-size:12px; color:var(--inkSoft); margin:4px 0 0;}
+  .toggle-btn{margin-top:8px; display:flex; align-items:center; justify-content:space-between; width:100%; background:none; border:none; color:var(--inkSoft); font-size:14px; padding:4px 0; cursor:pointer;}
+  .detail{margin-top:8px; padding-top:12px; border-top:1px solid var(--border); display:none;}
+  .detail.open{display:block;}
+  .entry-block{margin-bottom:12px;}
+  .entry-block:last-child{margin-bottom:0;}
+  .entry-label-row{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;}
+  .entry-label{font-size:12px; color:var(--inkSoft); width:64px; flex-shrink:0;}
+  .brm-group{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .brm-item{display:flex; align-items:center; gap:4px;}
+  .brm-item span{font-size:12px;}
+  .brm-item input{width:44px; text-align:center; border-radius:4px; padding:4px; font-size:13px;}
+  .b-input{border:1px solid var(--bueno); color:var(--bueno);}
+  .r-input{border:1px solid var(--regular); color:var(--regular);}
+  .m-input{border:1px solid var(--malo); color:var(--malo);}
+  .text-row{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
+  .text-row input{flex:1; min-width:0; font-size:12px; border:1px solid var(--border); border-radius:4px; padding:6px 8px;}
+  .code-row{display:flex; align-items:center; gap:4px; flex:1; min-width:0;}
+  .sn-btn{font-size:11px; border:1px solid var(--gold); color:var(--accent); background:none; border-radius:4px; padding:6px 8px; cursor:pointer; flex-shrink:0;}
+  .simple-fields{margin-top:12px;}
+  footer{font-size:12px; color:var(--inkSoft); padding:0 20px; margin-top:32px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="header-left">
+      <div class="logo-badge"><img src="logo.png" alt="Logo I.E. N° 0162 San José Obrero" /></div>
+      <div>
+        <p class="eyebrow">Control Patrimonial · Nivel Primaria</p>
+        <input id="schoolName" value="I.E. N° 0162 San José Obrero" aria-label="Nombre de la institución educativa" />
+        <p class="subtitle">Inventario de aula y Aula de Innovación Pedagógica (AIP)</p>
+      </div>
+    </div>
+    <div id="saveState"></div>
+  </div>
+</header>
+
+<div class="px">
+  <p class="section-label">Resumen por categoría</p>
+  <div class="resumen-grid" id="resumenGrid"></div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><p class="stat-value" id="statTotal" style="color:var(--accent)">0</p><p class="stat-label">Bienes registrados</p></div>
+    <div class="stat-card"><p class="stat-value" id="statCategorias" style="color:var(--gold)">0</p><p class="stat-label">Categorías</p></div>
+    <div class="stat-card"><p class="stat-value" id="statMalo" style="color:var(--malo)">0</p><p class="stat-label">En mal estado</p></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span>&#128269;</span>
+      <input id="searchInput" placeholder="Buscar categoría…" />
+    </div>
+    <button id="exportBtn">&#11015; Exportar CSV</button>
+  </div>
+
+  <div class="legend">
+    <span>Cada casilla se reparte en:</span>
+    <span><b style="color:var(--bueno)">B</b> = Bueno</span>
+    <span><b style="color:var(--regular)">R</b> = Regular</span>
+    <span><b style="color:var(--malo)">M</b> = Malo</span>
+    <span>+ Marca, Color, Código Patrimonial y N° de Serie (usa el botón S/N si no tiene)</span>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+
+<footer>Los datos se guardan automáticamente en este dispositivo.</footer>
+
+<script>
+const STORAGE_KEY = 'inventario-data';
+const DEFAULT_SCHOOL_NAME = 'I.E. N° 0162 San José Obrero';
+
+const LOCATIONS = [ { id:'aula', label:'Aula' }, { id:'aip', label:'AIP' } ];
+
+const CATEGORIES = [
+  { id:'computadoras', name:'Computadoras', kind:'location' },
+  { id:'proyector', name:'Proyector', kind:'location' },
+  { id:'proyector_portatil', name:'Proyector Portátil', kind:'kit', subItems:[
+      { id:'unidad', label:'Proyector' },
+      { id:'cable_hdmi', label:'Cable HDMI' },
+      { id:'cable_vga', label:'Cable VGA' },
+      { id:'parlante', label:'Parlante' },
+      { id:'cable_poder', label:'Cable de poder' },
+  ]},
+  { id:'laptop_xo', name:'Laptop XO', kind:'simple' },
+  { id:'laptop', name:'Laptop', kind:'simple' },
+  { id:'impresora', name:'Impresora', kind:'simple' },
+  { id:'linea_internet', name:'Línea de Internet', kind:'simple' },
+  { id:'teclado', name:'Teclado', kind:'simple' },
+  { id:'mouse', name:'Mouse', kind:'simple' },
+  { id:'cpu', name:'CPU', kind:'simple' },
+  { id:'cable_vga', name:'Cable VGA', kind:'simple' },
+  { id:'cable_hdmi', name:'Cable HDMI', kind:'simple' },
+  { id:'cable_poder', name:'Cable de Poder', kind:'simple' },
+  { id:'cable_extension', name:'Cable de Extensión', kind:'simple' },
+  { id:'parlante', name:'Parlante', kind:'simple' },
+  { id:'ventilador', name:'Ventilador', kind:'simple' },
+  { id:'sillas', name:'Sillas', kind:'simple' },
+  { id:'armario', name:'Armario', kind:'simple' },
+  { id:'puerta', name:'Puerta', kind:'simple' },
+  { id:'mesas', name:'Mesas', kind:'simple' },
+  { id:'tacho', name:'Tacho', kind:'simple' },
+  { id:'podio', name:'Podio', kind:'simple' },
+];
+
+function emptyEntry(){ return { bueno:0, regular:0, malo:0, marca:'', color:'', codigoPatrimonial:'', numeroSerie:'' }; }
+function entrySum(e){ return e.bueno + e.regular + e.malo; }
+
+function defaultItemData(cat){
+  if(cat.kind==='location') return { aula: emptyEntry(), aip: emptyEntry() };
+  if(cat.kind==='kit'){ const o={}; cat.subItems.forEach(s=>o[s.id]=emptyEntry()); return o; }
+  return emptyEntry();
+}
+function buildDefaultItems(){ const o={}; CATEGORIES.forEach(c=>o[c.id]=defaultItemData(c)); return o; }
+function categoryEntries(cat, data){
+  if(cat.kind==='location') return LOCATIONS.map(l=>data[l.id]);
+  if(cat.kind==='kit') return cat.subItems.map(s=>data[s.id]);
+  return [data];
+}
+function categoryBreakdown(cat, data){
+  return categoryEntries(cat,data).reduce((acc,e)=>({
+    bueno:acc.bueno+e.bueno, regular:acc.regular+e.regular, malo:acc.malo+e.malo, total:acc.total+entrySum(e)
+  }), {bueno:0,regular:0,malo:0,total:0});
+}
+
+let state = { schoolName: DEFAULT_SCHOOL_NAME, items: buildDefaultItems() };
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    const defaults = buildDefaultItems();
+    const merged = { ...defaults };
+    CATEGORIES.forEach(c=>{
+      const saved = (parsed.items||{})[c.id];
+      if(!saved) return;
+      const keys = Object.keys(defaults[c.id]);
+      const mc = {};
+      keys.forEach(k=>{
+        const se = saved[k];
+        mc[k] = (se && typeof se==='object') ? {
+          bueno:Number(se.bueno)||0, regular:Number(se.regular)||0, malo:Number(se.malo)||0,
+          marca: typeof se.marca==='string'?se.marca:'', color: typeof se.color==='string'?se.color:'',
+          codigoPatrimonial: typeof se.codigoPatrimonial==='string'?se.codigoPatrimonial:'',
+          numeroSerie: typeof se.numeroSerie==='string'?se.numeroSerie:'',
+        } : emptyEntry();
+      });
+      merged[c.id]=mc;
+    });
+    state.schoolName = parsed.schoolName || DEFAULT_SCHOOL_NAME;
+    state.items = merged;
+  }catch(e){ /* usar valores por defecto */ }
+}
+
+let saveTimer=null;
+function persist(){
+  const el = document.getElementById('saveState');
+  el.textContent = 'Guardando…'; el.classList.remove('error');
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    el.textContent = '✓ Guardado';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{ el.textContent=''; }, 1200);
+  }catch(e){
+    el.textContent = '⚠ No se pudo guardar'; el.classList.add('error');
+  }
+}
+
+const catRefs = {};
+const globalRefs = {};
+
+function recalcGlobal(){
+  let total=0, malo=0;
+  CATEGORIES.forEach(c=>{ const b=categoryBreakdown(c, state.items[c.id]); total+=b.total; malo+=b.malo; });
+  globalRefs.total.textContent = total;
+  globalRefs.malo.textContent = malo;
+}
+function recalcCategory(catId){
+  const cat = CATEGORIES.find(c=>c.id===catId);
+  const b = categoryBreakdown(cat, state.items[catId]);
+  const ref = catRefs[catId];
+  ref.totalLine.innerHTML = 'Total: <strong>'+b.total+'</strong> · <span style="color:var(--bueno)">'+b.bueno+'B</span> · <span style="color:var(--regular)">'+b.regular+'R</span> · <span style="color:var(--malo)">'+b.malo+'M</span>';
+  ref.resumenValue.textContent = b.total;
+  recalcGlobal();
+}
+
+function makeBRM(entry, onChange){
+  const wrap = document.createElement('div');
+  wrap.className = 'brm-group';
+  [ ['bueno','B','b-input','Bueno'], ['regular','R','r-input','Regular'], ['malo','M','m-input','Malo'] ].forEach(([key,label,cls,title])=>{
+    const item = document.createElement('label');
+    item.className = 'brm-item';
+    item.title = title;
+    const span = document.createElement('span');
+    span.textContent = label;
+    span.style.color = 'var(--'+key+')';
+    const input = document.createElement('input');
+    input.type = 'number'; input.min = '0'; input.value = entry[key];
+    input.className = cls;
+    input.addEventListener('input', ()=>{
+      const v = Math.max(0, Number(input.value)||0);
+      entry[key] = v;
+      persist();
+      onChange();
+    });
+    item.appendChild(span); item.appendChild(input);
+    wrap.appendChild(item);
+  });
+  return wrap;
+}
+
+function makeTextRow(entry, key1, ph1, key2, ph2){
+  const row = document.createElement('div');
+  row.className = 'text-row';
+  [ [key1,ph1], [key2,ph2] ].forEach(([key,ph])=>{
+    const input = document.createElement('input');
+    input.type='text'; input.placeholder=ph; input.value=entry[key];
+    input.addEventListener('input', ()=>{ entry[key]=input.value; persist(); });
+    row.appendChild(input);
+  });
+  return row;
+}
+
+function makeCodeRow(entry, key, placeholder){
+  const wrap = document.createElement('div');
+  wrap.className = 'code-row';
+  const input = document.createElement('input');
+  input.type='text'; input.placeholder=placeholder; input.value=entry[key];
+  input.addEventListener('input', ()=>{ entry[key]=input.value; persist(); });
+  const btn = document.createElement('button');
+  btn.type='button'; btn.className='sn-btn'; btn.textContent='S/N'; btn.title='Marcar como Sin Número';
+  btn.addEventListener('click', ()=>{ entry[key]='S/N'; input.value='S/N'; persist(); });
+  wrap.appendChild(input); wrap.appendChild(btn);
+  return wrap;
+}
+
+function makeCodeFields(entry){
+  const row = document.createElement('div');
+  row.className = 'text-row';
+  row.appendChild(makeCodeRow(entry, 'codigoPatrimonial', 'Código patrimonial'));
+  row.appendChild(makeCodeRow(entry, 'numeroSerie', 'N° de serie'));
+  return row;
+}
+
+function makeEntryRow(label, entry, onChange){
+  const wrap = document.createElement('div');
+  wrap.className = 'entry-block';
+  const labelRow = document.createElement('div');
+  labelRow.className = 'entry-label-row';
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'entry-label'; labelSpan.textContent = label;
+  labelRow.appendChild(labelSpan);
+  labelRow.appendChild(makeBRM(entry, onChange));
+  wrap.appendChild(labelRow);
+  wrap.appendChild(makeTextRow(entry, 'marca', 'Marca', 'color', 'Color'));
+  wrap.appendChild(makeCodeFields(entry));
+  return wrap;
+}
+
+function buildCategoryCard(cat, index){
+  const data = state.items[cat.id];
+  const code = 'PAT-' + String(index+1).padStart(3,'0');
+  const card = document.createElement('div');
+  card.className = 'cat-card';
+
+  const codeSpan = document.createElement('span');
+  codeSpan.className = 'cat-code'; codeSpan.textContent = code;
+  card.appendChild(codeSpan);
+
+  const title = document.createElement('h3');
+  title.className = 'cat-title'; title.textContent = cat.name;
+  card.appendChild(title);
+
+  const totalLine = document.createElement('p');
+  totalLine.className = 'cat-total';
+  card.appendChild(totalLine);
+
+  const onChange = ()=> recalcCategory(cat.id);
+
+  if(cat.kind === 'simple'){
+    const fieldsWrap = document.createElement('div');
+    fieldsWrap.className = 'simple-fields';
+    fieldsWrap.appendChild(makeBRM(data, onChange));
+    fieldsWrap.appendChild(makeTextRow(data, 'marca', 'Marca', 'color', 'Color'));
+    fieldsWrap.appendChild(makeCodeFields(data));
+    card.appendChild(fieldsWrap);
+  } else {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type='button'; toggleBtn.className='toggle-btn';
+    toggleBtn.innerHTML = '<span>Ver / editar detalle</span><span>&#9660;</span>';
+    const detail = document.createElement('div');
+    detail.className = 'detail';
+
+    if(cat.kind === 'location'){
+      LOCATIONS.forEach(loc=> detail.appendChild(makeEntryRow(loc.label, data[loc.id], onChange)));
+    } else if(cat.kind === 'kit'){
+      cat.subItems.forEach(si=> detail.appendChild(makeEntryRow(si.label, data[si.id], onChange)));
+    }
+
+    toggleBtn.addEventListener('click', ()=>{
+      const open = detail.classList.toggle('open');
+      toggleBtn.innerHTML = open
+        ? '<span>Ocultar detalle</span><span>&#9650;</span>'
+        : '<span>Ver / editar detalle</span><span>&#9660;</span>';
+    });
+
+    card.appendChild(toggleBtn);
+    card.appendChild(detail);
+  }
+
+  const b = categoryBreakdown(cat, data);
+  totalLine.innerHTML = 'Total: <strong>'+b.total+'</strong> · <span style="color:var(--bueno)">'+b.bueno+'B</span> · <span style="color:var(--regular)">'+b.regular+'R</span> · <span style="color:var(--malo)">'+b.malo+'M</span>';
+
+  catRefs[cat.id] = { totalLine, resumenValue:null };
+  return card;
+}
+
+function buildResumenChip(cat){
+  const chip = document.createElement('div');
+  chip.className = 'resumen-chip';
+  const nameSpan = document.createElement('span'); nameSpan.textContent = cat.name;
+  const valSpan = document.createElement('span');
+  const b = categoryBreakdown(cat, state.items[cat.id]);
+  valSpan.textContent = b.total;
+  chip.appendChild(nameSpan); chip.appendChild(valSpan);
+  if(catRefs[cat.id]) catRefs[cat.id].resumenValue = valSpan;
+  else catRefs[cat.id] = { totalLine:null, resumenValue: valSpan };
+  return chip;
+}
+
+function downloadCSV(){
+  const rows = [['Código','Categoría','Detalle','Código Patrimonial','N° de Serie','Marca','Color','Bueno','Regular','Malo','Total']];
+  CATEGORIES.forEach((c,i)=>{
+    const code = 'PAT-' + String(i+1).padStart(3,'0');
+    const d = state.items[c.id];
+    if(c.kind==='location'){
+      LOCATIONS.forEach(loc=>{ const e=d[loc.id]; rows.push([code,c.name,loc.label,e.codigoPatrimonial,e.numeroSerie,e.marca,e.color,e.bueno,e.regular,e.malo,entrySum(e)]); });
+    } else if(c.kind==='kit'){
+      c.subItems.forEach(si=>{ const e=d[si.id]; rows.push([code,c.name,si.label,e.codigoPatrimonial,e.numeroSerie,e.marca,e.color,e.bueno,e.regular,e.malo,entrySum(e)]); });
+    } else {
+      rows.push([code,c.name,'General',d.codigoPatrimonial,d.numeroSerie,d.marca,d.color,d.bueno,d.regular,d.malo,entrySum(d)]);
+    }
+  });
+  const csv = rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'inventario.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function init(){
+  loadState();
+
+  document.getElementById('schoolName').value = state.schoolName;
+  document.getElementById('schoolName').addEventListener('blur', (e)=>{ state.schoolName = e.target.value; persist(); });
+
+  const resumenGrid = document.getElementById('resumenGrid');
+  const cardsGrid = document.getElementById('cardsGrid');
+
+  CATEGORIES.forEach((cat)=>{ resumenGrid.appendChild(buildResumenChip(cat)); });
+  CATEGORIES.forEach((cat, idx)=>{ cardsGrid.appendChild(buildCategoryCard(cat, idx)); });
+
+  globalRefs.total = document.getElementById('statTotal');
+  globalRefs.malo = document.getElementById('statMalo');
+  document.getElementById('statCategorias').textContent = CATEGORIES.length;
+  recalcGlobal();
+
+  document.getElementById('exportBtn').addEventListener('click', downloadCSV);
+
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    const q = e.target.value.toLowerCase();
+    Array.from(cardsGrid.children).forEach((card, i)=>{
+      const name = CATEGORIES[i].name.toLowerCase();
+      card.style.display = name.includes(q) ? '' : 'none';
+    });
+  });
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
